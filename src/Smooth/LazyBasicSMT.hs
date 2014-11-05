@@ -32,7 +32,12 @@ trySAT theory cnfForm = case formIsSat of
       _ -> (False, M.empty)
     literals = buildClauseFromSatAsg satisfyingAsg
     (assignmentIsSatInTheory, lemma) = decideSat theory literals
-    propLemma = clause $ L.map Prop.lit $ S.toList lemma
+    propLemma = clause $ L.map propNegates $ S.toList lemma
+
+propNegates :: Literal -> Prop.Atom Literal
+propNegates l = case isNeg l of
+  True -> negation $ Prop.lit $ Fol.lit $ Fol.getAtom l
+  False -> Prop.lit l
 
 buildClauseFromSatAsg :: Map Literal Bool -> Set Literal
 buildClauseFromSatAsg lits = S.fromList $ L.map negateFalseLit $ M.toList lits
